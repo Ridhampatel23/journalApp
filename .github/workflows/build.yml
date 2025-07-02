@@ -33,4 +33,8 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ridham_journalapp
+        run: > 
+            mvn -B verify -DskipTests 
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
+            -Dsonar.projectKey=ridham_journalapp -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.branch.target=main
