@@ -30,13 +30,13 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
+      - name: Build and analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
           mvn -B verify -DskipTests
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-          -Dsonar.projectKey=net.ridham:journalApp
-          -Dsonar.organization=your_org_key
+          -Dsonar.projectKey=Ridhampatel23_journalApp
+          -Dsonar.organization=ridhampatel23
           -Dsonar.host.url=https://sonarcloud.io
       
