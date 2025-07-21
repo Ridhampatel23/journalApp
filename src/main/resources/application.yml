@@ -1,0 +1,5 @@
+#this is the default profile that will run and where we can give main instruction
+
+spring:
+  profiles:
+    active: dev
