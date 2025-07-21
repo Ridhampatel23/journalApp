@@ -9,8 +9,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/public")
 public class PublicController {
 
+    public PublicController() {
+        System.out.println("PublicController loaded...");
+    }
+
     @Autowired
     private UserService userService;
+
+
 
     @GetMapping("/health-check")
     String healthCheck() {

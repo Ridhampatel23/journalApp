@@ -1,0 +1,23 @@
+#In terms of application properties , the order of priorities is : CLI -> application.properties -> application.yml
+#you can also use intellijs integrated run config and pass the properties in program arguments
+#(eg : --server.port=9090)
+
+spring:
+  data:
+    mongodb:
+      uri: YOUR_MONGO_URI
+      database: journaldb
+      auto-index-creation: true
+
+
+server:
+  port: 8080
+  servlet:
+    #context path is the string that we have to add before each api endpoint and it should be a meaningful name such as app name
+    context-path: /journal
+
+weather:
+  api:
+    key: "YOUR_WEATHER_API_KEY"
+
+

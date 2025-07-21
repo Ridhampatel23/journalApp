@@ -1,8 +1,10 @@
 package net.ridham.journalApp.controller;
 
+import net.ridham.journalApp.api.response.WeatherResponse;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.repository.UserRepo;
 import net.ridham.journalApp.service.UserService;
+import net.ridham.journalApp.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private WeatherService weatherService;
 
     @GetMapping
     public List<UserEntity> getAllUsers(){
@@ -47,6 +51,17 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         userRepo.deleteByUserName(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/greeting")
+    public ResponseEntity<?> greeting(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weather = weatherService.getWeather("Mumbai");
+        String greeting = "";
+        if (weather != null){
+            greeting = "Weather feels like " + weather.getCurrent().getFeelslike();
+        }
+        return new ResponseEntity<>("Hi " + authentication.getName() + greeting ,HttpStatus.OK);
     }
 
 
