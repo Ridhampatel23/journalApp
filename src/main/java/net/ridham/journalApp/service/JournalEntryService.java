@@ -6,7 +6,7 @@ import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.repository.JournalEntryRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 /// A service class contains business logic which is then
 /// called and used by controller class to make API endpoints
-@Component
+@Service
 @Slf4j
 public class JournalEntryService {
 
