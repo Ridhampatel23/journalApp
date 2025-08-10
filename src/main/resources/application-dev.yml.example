@@ -1,0 +1,45 @@
+#In terms of application properties , the order of priorities is : CLI -> application.properties -> application.yml
+#you can also use intellijs integrated run config and pass the properties in program arguments
+#(eg : --server.port=9090)
+
+spring:
+
+    #Redis serializer and de-serializer needs to be configured to match the CLI
+    #or else the springboot ones will be different from the cli
+  redis:
+    host: HOST_URI
+    port: HOST_PORT
+    username: default
+    password: REDIS_HOST_PASSWORD
+    ssl:
+      enabled: true
+  data:
+    mongodb:
+      uri: YOUR_MONGO_URI
+      database: journaldb
+      auto-index-creation: true
+
+  mail:
+    host: smtp.gmail.com
+    username: YOUR_EMAIL@gmail.com
+    password: YOUR_EMAIL_GOOGLE_APP_PASSWORD
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+
+server:
+  port: 8080
+  servlet:
+    #context path is the string that we have to add before each api endpoint and it should be a meaningful name such as app name
+    context-path: /journal
+
+weather:
+  api:
+    key: "YOUR_WEATHER_API_KEY"
+
+
