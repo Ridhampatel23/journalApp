@@ -1,7 +1,6 @@
 package net.ridham.journalApp.entity;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -14,6 +13,9 @@ import java.util.List;
 /// These classes are called POJO classes : Plain Old Java Objects
 @Document(collection = "users")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
 
         @Id
@@ -22,6 +24,8 @@ public class UserEntity {
         // add auto-index-creation in application.properties
         @NonNull
         private String userName;
+        private String email;
+        private String sentimentAnalysis;
         @NonNull
         private String password;
         //Declaring it as Arraylist will help you make it an exmpty list instead of null
