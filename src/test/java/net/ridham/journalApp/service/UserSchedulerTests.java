@@ -1,19 +1,18 @@
 package net.ridham.journalApp.service;
 
-import org.junit.jupiter.api.Disabled;
+import net.ridham.journalApp.scheduler.UserScheduler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class EmailServiceTests {
+public class UserSchedulerTests {
 
     @Autowired
-    private EmailService emailService;
+    private UserScheduler userScheduler;
 
-    @Disabled
     @Test
-    void testSendEmail() {
-        emailService.sendEmail("TARGET_EMAIL", "Testing", "Kese ho bc");
+    public void testFetchUsersAndSendSentimentAnalysisEmail() {
+        userScheduler.fetchUsersAndSendSentimentMail();
     }
 }

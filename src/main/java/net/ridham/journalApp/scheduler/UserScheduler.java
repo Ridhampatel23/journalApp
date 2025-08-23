@@ -4,9 +4,11 @@ import net.ridham.journalApp.cache.AppCache;
 import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.enums.Sentiment;
+import net.ridham.journalApp.model.SentimentData;
 import net.ridham.journalApp.repository.UserRepoImpl;
 import net.ridham.journalApp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +26,10 @@ public class UserScheduler {
     private AppCache appCache;
 
     @Autowired
-    private EmailService emailService;
+    private UserRepoImpl userRepo;
 
     @Autowired
-    private UserRepoImpl userRepo;
+    private KafkaTemplate<String, SentimentData> kafkaTemplate;
 
     // To make scheduled tasks work, you need to communicate with springboot that you
     //have a @scheduled annotation. You can achieve it by annotating the main class
@@ -52,7 +54,8 @@ public class UserScheduler {
                    }
                }
                if (mostFrequentSentiment != null) {
-                   emailService.sendEmail(user.getEmail(), "Sentiment for last week", mostFrequentSentiment.toString());
+                   SentimentData sentimentData = SentimentData.builder().email(user.getEmail()).sentiment("Sentiment for the last 7 days is " + mostFrequentSentiment).build();
+                   kafkaTemplate.send("weekly_sentiments", sentimentData.getEmail(), sentimentData);
                }
            }
         }
