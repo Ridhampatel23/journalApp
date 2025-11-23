@@ -15,8 +15,8 @@ import java.util.Optional;
 
 /// A service class contains business logic which is then
 /// called and used by controller class to make API endpoints
-@Slf4j
 @Service
+@Slf4j
 public class UserService {
 
     @Autowired
@@ -24,23 +24,25 @@ public class UserService {
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public void saveNewUser(UserEntity user) {
-        try{
+    public UserEntity saveNewUser(UserEntity user) {
+        try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRoles(Arrays.asList("User"));
-            userRepository.save(user);
+            return userRepository.save(user);
         } catch (Exception e) {
-            log.error("Exception" , e );
+            log.error("Exception", e);
+            throw new RuntimeException("Error saving user", e);
         }
     }
 
-    public void saveAdmin(UserEntity user) {
-        try{
+    public UserEntity saveAdmin(UserEntity user) {
+        try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRoles(Arrays.asList("User", "Admin"));
-            userRepository.save(user);
+            return userRepository.save(user);
         } catch (Exception e) {
-            log.error("Exception" , e );
+            log.error("Exception", e);
+            throw new RuntimeException("Error saving admin user", e);
         }
     }
 
@@ -63,5 +65,4 @@ public class UserService {
     public UserEntity findUserByUsername(String userName) {
         return userRepository.findByUserName(userName);
     }
-
 }
