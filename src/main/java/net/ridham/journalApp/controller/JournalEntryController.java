@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/journal")
 @Tag(name = "Journal", description = "Endpoints for journal entries linked to the authenticated user")
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "BearerAuth")
 public class JournalEntryController {
 
     @Autowired

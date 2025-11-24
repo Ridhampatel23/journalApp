@@ -35,14 +35,24 @@ public class UserService {
         }
     }
 
-    public UserEntity saveAdmin(UserEntity user) {
+    public UserEntity saveAdmin(String Id) {
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRoles(Arrays.asList("User", "Admin"));
+            ObjectId objectId = new ObjectId(Id);
+            Optional<UserEntity> optionalUser = userRepository.findById(objectId);
+
+            if (!optionalUser.isPresent()){
+                throw new  RuntimeException("User not found");
+            }
+
+            UserEntity user = optionalUser.get();
+
+            user.setRoles(Arrays.asList("ADMIN", "User"));
+
             return userRepository.save(user);
+
         } catch (Exception e) {
-            log.error("Exception", e);
-            throw new RuntimeException("Error saving admin user", e);
+            log.error("Error while promoting user to admin", e);
+            throw new RuntimeException("Error while promoting user to admin", e);
         }
     }
 

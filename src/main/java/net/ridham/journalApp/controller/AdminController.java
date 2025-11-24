@@ -1,6 +1,7 @@
 package net.ridham.journalApp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/admin")
 @Tag(name = "Admin", description = "Admin-only endpoints for user management and cache control")
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "BearerAuth")
 public class AdminController {
 
     @Autowired
@@ -53,19 +54,32 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/create-admin-user")
+    @PostMapping("/make-admin/{id}")
     @Operation(
-            summary = "Create an admin user",
-            description = "Creates a new user with admin role. Intended for admin use."
+            summary = "Promote user to admin",
+            description = "Adds the Admin role to an existing user with the given id. Only accessible by existing admins."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Admin user created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
+            @ApiResponse(responseCode = "200", description = "User promoted to admin successfully",
+                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<Void> createUser(@RequestBody UserEntity user) {
-        userService.saveAdmin(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<UserResponseDTO> makeAdmin(
+            @Parameter(description = "ID of the user to promote to admin")
+            @PathVariable String id
+    ) {
+        try {
+            UserEntity updated = userService.saveAdmin(id);
+            UserResponseDTO dto = UserMapper.toDTO(updated);
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().startsWith("User not found")) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @GetMapping("clear-app-cache")
     @Operation(

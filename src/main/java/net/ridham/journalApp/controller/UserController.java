@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/user")
 @Tag(name = "User", description = "Endpoints for user management and user-specific actions")
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "BearerAuth")
 public class UserController {
 
     @Autowired
