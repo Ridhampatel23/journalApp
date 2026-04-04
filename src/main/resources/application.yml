@@ -2,4 +2,4 @@
 
 spring:
   profiles:
-    active: dev2
+    active: ${SPRING_PROFILES_ACTIVE:dev2}
