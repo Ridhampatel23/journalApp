@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Autowired
+    //@Autowired
     private JavaMailSender javaMailSender;//Won't detect bean unless we make one in config
 
     public void sendEmail(String to, String subject, String body) {

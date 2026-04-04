@@ -17,9 +17,16 @@ public class UserRepoImpl {
 
     public List<UserEntity> getUsersForSentimentAnalysis() {
         Query query = new Query();
-        query.addCriteria(Criteria.where("email").regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,6}$"));
-        query.addCriteria(Criteria.where("email").ne(null).ne(""));
-        query.addCriteria(Criteria.where("sentimentAnalysis").is(true));
+
+        query.addCriteria(
+                new Criteria().andOperator(
+                        Criteria.where("email").ne(null),
+                        Criteria.where("email").ne(""),
+                        Criteria.where("email").regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"),
+                        Criteria.where("sentimentAnalysis").is(true)
+                )
+        );
+
         return mongoTemplate.find(query, UserEntity.class);
     }
 

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SentimentData {
+public class SentimentQueueMessage {
     private String email;
     private String sentiment;
 }

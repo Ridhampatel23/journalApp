@@ -4,9 +4,9 @@ import net.ridham.journalApp.cache.AppCache;
 import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.enums.Sentiment;
-import net.ridham.journalApp.model.SentimentData;
+import net.ridham.journalApp.model.SentimentQueueMessage;
 import net.ridham.journalApp.repository.UserRepoImpl;
-import net.ridham.journalApp.service.EmailService;
+import net.ridham.journalApp.service.SqsProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,12 +29,12 @@ public class UserScheduler {
     private UserRepoImpl userRepo;
 
     @Autowired
-    private KafkaTemplate<String, SentimentData> kafkaTemplate;
+    private SqsProducerService sqsProducerService;
 
     // To make scheduled tasks work, you need to communicate with springboot that you
     //have a @scheduled annotation. You can achieve it by annotating the main class
     // with @EnableScheduling
-    @Scheduled(cron = "0 0 8 * * SUN")
+    //@Scheduled(cron = "0 0 8 * * SUN")
     public void fetchUsersAndSendSentimentMail(){
         List<UserEntity> users = userRepo.getUsersForSentimentAnalysis();
         for (UserEntity user : users) {
@@ -54,15 +54,15 @@ public class UserScheduler {
                    }
                }
                if (mostFrequentSentiment != null) {
-                   SentimentData sentimentData = SentimentData.builder().email(user.getEmail()).sentiment("Sentiment for the last 7 days is " + mostFrequentSentiment).build();
-                   kafkaTemplate.send("weekly_sentiments", sentimentData.getEmail(), sentimentData);
+                   SentimentQueueMessage sentimentQueueMessage = SentimentQueueMessage.builder().email(user.getEmail()).sentiment("Sentiment for the last 7 days is " + mostFrequentSentiment).build();
+                   sqsProducerService.sendWeeklySentimentMessage(sentimentQueueMessage);
                }
            }
         }
 
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    //@Scheduled(cron = "0 */5 * * * *")
     public void clearAppCache(){
         appCache.init();
     }

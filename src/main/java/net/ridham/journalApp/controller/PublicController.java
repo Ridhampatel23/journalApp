@@ -6,6 +6,9 @@ import net.ridham.journalApp.dto.request.UserRegistrationRequest;
 import net.ridham.journalApp.dto.response.UserResponseDTO;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.mapper.UserMapper;
+import net.ridham.journalApp.model.SentimentQueueMessage;
+import net.ridham.journalApp.scheduler.UserScheduler;
+import net.ridham.journalApp.service.SqsProducerService;
 import net.ridham.journalApp.service.UserDetailsServiceImpl;
 import net.ridham.journalApp.service.UserService;
 import net.ridham.journalApp.utils.JWTUtil;
@@ -103,5 +106,18 @@ public class PublicController {
             log.error(e.getMessage());
             return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Autowired
+    private UserScheduler userScheduler;
+
+    @Autowired
+    private SqsProducerService sqsProducerService;
+
+    @PostMapping("/test-sqs")
+    public String testSqs() {
+        SentimentQueueMessage sentimentQueueMessage = SentimentQueueMessage.builder().email("Ridhamsangani.23@gmail.com").sentiment("Sentiment for the last 7 days is " + "HAPPY").build();
+        sqsProducerService.sendWeeklySentimentMessage(sentimentQueueMessage);
+        return "Triggered SQS sentiment producer";
     }
 }

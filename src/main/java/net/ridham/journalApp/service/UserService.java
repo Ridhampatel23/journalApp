@@ -27,7 +27,7 @@ public class UserService {
     public UserEntity saveNewUser(UserEntity user) {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRoles(Arrays.asList("User"));
+            user.setRoles(Arrays.asList("USER"));
             return userRepository.save(user);
         } catch (Exception e) {
             log.error("Exception", e);
@@ -46,7 +46,7 @@ public class UserService {
 
             UserEntity user = optionalUser.get();
 
-            user.setRoles(Arrays.asList("ADMIN", "User"));
+            user.setRoles(Arrays.asList("ADMIN", "USER"));
 
             return userRepository.save(user);
 
