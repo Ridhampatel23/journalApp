@@ -71,7 +71,7 @@ public class GoogleAuthController {
             String userInfoUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
             ResponseEntity<Map> userInfoResponse = restTemplate.getForEntity(userInfoUrl, Map.class);
 
-            if(userInfoResponse.getStatusCode() ==  HttpStatus.OK){
+            if(userInfoResponse.getStatusCode() ==  HttpStatus.OK) {
                 Map<String, Object> userInfo = userInfoResponse.getBody();
                 String email = (String) userInfo.get("email");
                 UserDetails userDetails = null;
@@ -87,10 +87,9 @@ public class GoogleAuthController {
                 }
                 String jwtToken = jwtUtil.generateToken(email);
                 return ResponseEntity.ok(Collections.singletonMap("token", jwtToken));
-
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+                return ResponseEntity.status(401).build();
+
         } catch (Exception e) {
             log.error("Exception occured while handleGoogleCallBack", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
