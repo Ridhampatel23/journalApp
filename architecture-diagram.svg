@@ -1,0 +1,292 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" style="background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="awsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9900;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#FF9900;stop-opacity:0.05" />
+    </linearGradient>
+    <linearGradient id="localGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#2196F3;stop-opacity:0.05" />
+    </linearGradient>
+    <linearGradient id="albGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="ecsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="mongoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="redisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="sqsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="eventBridgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f43f5e;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#f43f5e;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="sesGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#84cc16;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#84cc16;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="grafanaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.1" />
+    </linearGradient>
+    <linearGradient id="prometheusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e88640;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#e88640;stop-opacity:0.1" />
+    </linearGradient>
+
+    <!-- Arrow marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+    </marker>
+
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" font-size="28" font-weight="bold" fill="#1e1e1e">JournalApp - Complete AWS Architecture</text>
+
+  <!-- AWS Cloud Container -->
+  <rect x="50" y="70" width="1300" height="580" rx="15" fill="url(#awsGrad)" stroke="#666" stroke-width="2" stroke-dasharray="10,5"/>
+  <text x="70" y="100" font-size="16" font-weight="bold" fill="#666">AWS Cloud (us-east-1)</text>
+
+  <!-- Internet Gateway / Users -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="120" width="180" height="70" rx="10" fill="url(#albGrad)" stroke="#3b82f6" stroke-width="2"/>
+    <text x="190" y="150" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">Internet Users</text>
+    <text x="190" y="170" text-anchor="middle" font-size="12" fill="#555">🌐 External Traffic</text>
+  </g>
+
+  <!-- Application Load Balancer -->
+  <g filter="url(#shadow)">
+    <rect x="350" y="120" width="200" height="70" rx="10" fill="url(#albGrad)" stroke="#3b82f6" stroke-width="2"/>
+    <text x="450" y="150" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">Application Load Balancer</text>
+    <text x="450" y="170" text-anchor="middle" font-size="12" fill="#555">Port 80 → 8080</text>
+  </g>
+
+  <!-- ECS Fargate Cluster -->
+  <g filter="url(#shadow)">
+    <rect x="620" y="110" width="400" height="180" rx="10" fill="url(#ecsGrad)" stroke="#10b981" stroke-width="2"/>
+    <text x="820" y="135" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">ECS Fargate Cluster</text>
+    <text x="820" y="155" text-anchor="middle" font-size="12" fill="#555">journal-cluster</text>
+
+    <!-- Task 1 -->
+    <rect x="650" y="165" width="150" height="50" rx="8" fill="#059669" stroke="#047857" stroke-width="1.5"/>
+    <text x="725" y="188" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Task 1</text>
+    <text x="725" y="205" text-anchor="middle" font-size="10" fill="white">Journal App :8080</text>
+
+    <!-- Task 2 -->
+    <rect x="820" y="165" width="150" height="50" rx="8" fill="#059669" stroke="#047857" stroke-width="1.5"/>
+    <text x="895" y="188" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Task 2</text>
+    <text x="895" y="205" text-anchor="middle" font-size="10" fill="white">Journal App :8080</text>
+
+    <!-- Task N -->
+    <rect x="735" y="230" width="150" height="50" rx="8" fill="#059669" stroke="#047857" stroke-width="1.5"/>
+    <text x="810" y="253" text-anchor="middle" font-size="11" font-weight="bold" fill="white">Task N</text>
+    <text x="810" y="270" text-anchor="middle" font-size="10" fill="white">Auto-scaling</text>
+  </g>
+
+  <!-- MongoDB Atlas -->
+  <g filter="url(#shadow)">
+    <rect x="1100" y="120" width="200" height="70" rx="10" fill="url(#mongoGrad)" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="1200" y="150" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">MongoDB Atlas</text>
+    <text x="1200" y="170" text-anchor="middle" font-size="12" fill="#555">M10 Cluster</text>
+  </g>
+
+  <!-- ElastiCache Redis -->
+  <g filter="url(#shadow)">
+    <rect x="1100" y="210" width="200" height="70" rx="10" fill="url(#redisGrad)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="1200" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">ElastiCache Redis</text>
+    <text x="1200" y="260" text-anchor="middle" font-size="12" fill="#555">cache.t3.micro</text>
+  </g>
+
+  <!-- CloudWatch -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="220" width="200" height="90" rx="10" fill="#ec489922" stroke="#ec4899" stroke-width="2"/>
+    <text x="200" y="250" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">CloudWatch</text>
+    <text x="200" y="270" text-anchor="middle" font-size="11" fill="#555">📊 Logs + Metrics</text>
+    <text x="200" y="290" text-anchor="middle" font-size="10" fill="#777">(Optional: AMP)</text>
+  </g>
+
+  <!-- SQS Queue -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="340" width="200" height="90" rx="10" fill="url(#sqsGrad)" stroke="#14b8a6" stroke-width="2"/>
+    <text x="200" y="370" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">Amazon SQS</text>
+    <text x="200" y="395" text-anchor="middle" font-size="11" fill="#555">Weekly Sentiment Queue</text>
+    <text x="200" y="415" text-anchor="middle" font-size="10" fill="#777">FIFO / Standard</text>
+  </g>
+
+  <!-- EventBridge Scheduler -->
+  <g filter="url(#shadow)">
+    <rect x="350" y="340" width="300" height="90" rx="10" fill="url(#eventBridgeGrad)" stroke="#f43f5e" stroke-width="2"/>
+    <text x="500" y="370" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">EventBridge Scheduler</text>
+    <text x="500" y="395" text-anchor="middle" font-size="12" fill="#555">⏰ cron(0 9 ? * SUN *)</text>
+    <text x="500" y="415" text-anchor="middle" font-size="11" fill="#777">Every Sunday 9 AM UTC</text>
+  </g>
+
+  <!-- Lambda Function -->
+  <g filter="url(#shadow)">
+    <rect x="700" y="340" width="250" height="90" rx="10" fill="#6366f122" stroke="#6366f1" stroke-width="2"/>
+    <text x="825" y="370" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">AWS Lambda (Java)</text>
+    <text x="825" y="395" text-anchor="middle" font-size="11" fill="#555">1. Poll SQS messages</text>
+    <text x="825" y="415" text-anchor="middle" font-size="11" fill="#555">2. Send email via SES</text>
+  </g>
+
+  <!-- Amazon SES -->
+  <g filter="url(#shadow)">
+    <rect x="1000" y="340" width="200" height="90" rx="10" fill="url(#sesGrad)" stroke="#84cc16" stroke-width="2"/>
+    <text x="1100" y="370" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">Amazon SES</text>
+    <text x="1100" y="395" text-anchor="middle" font-size="11" fill="#555">📧 Weekly Sentiment Emails</text>
+    <text x="1100" y="415" text-anchor="middle" font-size="10" fill="#777">User Notifications</text>
+  </g>
+
+  <!-- Secrets Manager -->
+  <g filter="url(#shadow)">
+    <rect x="350" y="460" width="350" height="70" rx="10" fill="#6366f122" stroke="#6366f1" stroke-width="2"/>
+    <text x="525" y="485" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">SSM Parameter Store / Secrets Manager</text>
+    <text x="525" y="510" text-anchor="middle" font-size="11" fill="#555">🔐 JWT Secret, DB Credentials, API Keys</text>
+  </g>
+
+  <!-- ECR -->
+  <g filter="url(#shadow)">
+    <rect x="750" y="460" width="200" height="70" rx="10" fill="#f9731622" stroke="#f97316" stroke-width="2"/>
+    <text x="850" y="485" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">ECR Registry</text>
+    <text x="850" y="510" text-anchor="middle" font-size="11" fill="#555">journal-app:latest</text>
+  </g>
+
+  <!-- External Services -->
+  <g filter="url(#shadow)">
+    <rect x="1100" y="460" width="200" height="120" rx="10" fill="#a855f722" stroke="#a855f7" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="1200" y="485" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">External Services</text>
+    <text x="1120" y="510" font-size="11" fill="#555">☁️ Weather API</text>
+    <text x="1120" y="530" font-size="11" fill="#555">🔐 Google OAuth 2.0</text>
+    <text x="1120" y="550" font-size="11" fill="#555">🎯 Sentiment Analysis</text>
+    <text x="1120" y="570" font-size="11" fill="#555">🔑 JWT Generation</text>
+  </g>
+
+  <!-- Local Monitoring Stack Container -->
+  <rect x="50" y="680" width="1300" height="280" rx="15" fill="url(#localGrad)" stroke="#666" stroke-width="2"/>
+  <text x="70" y="710" font-size="16" font-weight="bold" fill="#666">Local / EC2 Monitoring Stack (Optional for Production)</text>
+
+  <!-- Grafana Options Box -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="730" width="250" height="140" rx="10" fill="#ef444422" stroke="#ef4444" stroke-width="2"/>
+    <text x="225" y="755" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">Grafana Options</text>
+    <text x="225" y="780" text-anchor="middle" font-size="11" fill="#555">1. EC2 t3.small (~$10/mo)</text>
+    <text x="225" y="800" text-anchor="middle" font-size="11" fill="#555">2. Amazon MG (~$35/mo)</text>
+    <text x="225" y="820" text-anchor="middle" font-size="11" fill="#555">3. ECS Fargate (~$8/mo)</text>
+    <text x="225" y="845" text-anchor="middle" font-size="11" fill="#775">4. Local Docker (dev)</text>
+  </g>
+
+  <!-- Grafana -->
+  <g filter="url(#shadow)">
+    <rect x="400" y="730" width="220" height="100" rx="10" fill="url(#grafanaGrad)" stroke="#ef4444" stroke-width="2"/>
+    <text x="510" y="760" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e1e1e">Grafana</text>
+    <text x="510" y="785" text-anchor="middle" font-size="12" fill="#555">Port 3000</text>
+    <text x="510" y="810" text-anchor="middle" font-size="11" fill="#777">admin / admin123</text>
+  </g>
+
+  <!-- Prometheus -->
+  <g filter="url(#shadow)">
+    <rect x="670" y="730" width="220" height="100" rx="10" fill="url(#prometheusGrad)" stroke="#e88640" stroke-width="2"/>
+    <text x="780" y="760" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e1e1e">Prometheus</text>
+    <text x="780" y="785" text-anchor="middle" font-size="12" fill="#555">Port 9090</text>
+    <text x="780" y="810" text-anchor="middle" font-size="11" fill="#777">Scrapes :8080/actuator</text>
+  </g>
+
+  <!-- Local App Container -->
+  <g filter="url(#shadow)">
+    <rect x="940" y="730" width="220" height="100" rx="10" fill="#3b82f622" stroke="#3b82f6" stroke-width="2"/>
+    <text x="1050" y="760" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e1e1e">Journal App</text>
+    <text x="1050" y="785" text-anchor="middle" font-size="12" fill="#555">Port 8080 (Docker)</text>
+    <text x="1050" y="810" text-anchor="middle" font-size="11" fill="#777">Spring Boot Actuator</text>
+  </g>
+
+  <!-- MongoDB Local -->
+  <g filter="url(#shadow)">
+    <rect x="1200" y="730" width="120" height="80" rx="10" fill="#8b5cf622" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="1260" y="755" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">MongoDB</text>
+    <text x="1260" y="780" text-anchor="middle" font-size="11" fill="#555">Port 27017</text>
+  </g>
+
+  <!-- Redis Local -->
+  <g filter="url(#shadow)">
+    <rect x="1200" y="830" width="120" height="80" rx="10" fill="#f59e0b22" stroke="#f59e0b" stroke-width="2"/>
+    <text x="1260" y="855" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e1e1e">Redis</text>
+    <text x="1260" y="880" text-anchor="middle" font-size="11" fill="#555">Port 6379</text>
+  </g>
+
+  <!-- Connection Arrows -->
+  <!-- Users → ALB -->
+  <line x1="280" y1="155" x2="350" y2="155" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="315" y="145" font-size="10" fill="#666">HTTP</text>
+
+  <!-- ALB → ECS -->
+  <line x1="550" y1="155" x2="620" y2="155" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="585" y="145" font-size="10" fill="#666">:8080</text>
+
+  <!-- ECS → MongoDB -->
+  <line x1="1020" y1="170" x2="1100" y2="170" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="1060" y="160" font-size="10" fill="#666">MongoDB URI</text>
+
+  <!-- ECS → Redis -->
+  <path d="M 1020 200 Q 1060 200, 1060 245 Q 1060 245, 1100 245" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
+  <text x="1060" y="235" font-size="10" fill="#666">Redis</text>
+
+  <!-- ECS → CloudWatch -->
+  <path d="M 620 200 Q 400 200, 300 265" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
+  <text x="380" y="240" font-size="10" fill="#666">Logs</text>
+
+  <!-- App → SQS -->
+  <path d="M 200 310 Q 200 325, 200 340" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- SQS → EventBridge → Lambda -->
+  <line x1="300" y1="385" x2="350" y2="385" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="650" y1="385" x2="700" y2="385" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Lambda → SES -->
+  <line x1="950" y1="385" x2="1000" y2="385" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="975" y="375" font-size="10" fill="#666">Send Email</text>
+
+  <!-- External Services connection -->
+  <line x1="1050" y1="200" x2="1100" y2="200" stroke="#a855f7" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+  <text x="1075" y="190" font-size="10" fill="#a855f7">HTTPS</text>
+
+  <!-- Monitoring connections -->
+  <line x1="350" y1="800" x2="400" y2="800" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="375" y="790" font-size="10" fill="#666">Query</text>
+
+  <line x1="620" y1="800" x2="670" y2="800" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="645" y="790" font-size="10" fill="#666">Scrape</text>
+
+  <line x1="890" y1="800" x2="940" y2="800" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <line x1="1160" y1="770" x2="1200" y2="770" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <path d="M 1160 780 Q 1180 780, 1180 865 Q 1180 865, 1200 865" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
+
+  <!-- Legend -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="980" width="300" height="15" rx="3" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+    <text x="60" y="992" font-size="10" fill="#666">Legend:</text>
+    <rect x="110" y="983" width="12" height="8" rx="2" fill="#3b82f622" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="128" y="992" font-size="9" fill="#666">Compute</text>
+    <rect x="180" y="983" width="12" height="8" rx="2" fill="#10b98122" stroke="#10b981" stroke-width="1.5"/>
+    <text x="198" y="992" font-size="9" fill="#666">Container</text>
+    <rect x="260" y="983" width="12" height="8" rx="2" fill="#8b5cf622" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="278" y="992" font-size="9" fill="#666">Database</text>
+  </g>
+</svg>

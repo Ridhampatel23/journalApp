@@ -9,11 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -92,9 +88,9 @@ public class GoogleAuthController {
                 String jwtToken = jwtUtil.generateToken(email);
                 return ResponseEntity.ok(Collections.singletonMap("token", jwtToken));
 
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
         } catch (Exception e) {
             log.error("Exception occured while handleGoogleCallBack", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
