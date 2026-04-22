@@ -1,5 +1,6 @@
 package net.ridham.journalApp.service;
 
+import com.mongodb.DuplicateKeyException;
 import lombok.extern.slf4j.Slf4j;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.repository.UserRepo;
@@ -29,7 +30,12 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRoles(Arrays.asList("USER"));
             return userRepository.save(user);
-        } catch (Exception e) {
+        } catch (DuplicateKeyException e) {
+            log.error("Duplicate key exception", e);
+            throw new RuntimeException(e);
+        }
+
+        catch (Exception e) {
             log.error("Exception", e);
             throw new RuntimeException("Error saving user", e);
         }

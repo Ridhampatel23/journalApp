@@ -1,5 +1,6 @@
 package net.ridham.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import net.ridham.journalApp.dto.request.LoginRequest;
 import net.ridham.journalApp.dto.request.UserRegistrationRequest;
@@ -114,6 +115,7 @@ public class PublicController {
     @Autowired
     private SqsProducerService sqsProducerService;
 
+    @Hidden
     @PostMapping("/test-sqs")
     public String testSqs() {
         SentimentQueueMessage sentimentQueueMessage = SentimentQueueMessage.builder().email("Ridhamsangani.23@gmail.com").sentiment("Sentiment for the last 7 days is " + "HAPPY").build();
