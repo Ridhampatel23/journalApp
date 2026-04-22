@@ -39,4 +39,4 @@ jobs:
           AWS_SQS_WEEKLY-SENTIMENT_QUEUE_URL: ${{ secrets.AWS_SQS_WEEKLY_SENTIMENT_QUEUE_URL }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Ridhampatel23_journalApp -Dsonar.organizationKey=ridhampatel23  -Daws.sqs.weekly-sentiment-queue-url="${AWS_SQS_WEEKLY_SENTIMENT_QUEUE_URL}"
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Ridhampatel23_journalApp -Dsonar.organization=ridhampatel23  -Daws.sqs.weekly-sentiment-queue-url="${AWS_SQS_WEEKLY_SENTIMENT_QUEUE_URL}"
