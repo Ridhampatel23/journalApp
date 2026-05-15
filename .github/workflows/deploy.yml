@@ -41,6 +41,8 @@ jobs:
     name: Push Image & Deploy
     runs-on: ubuntu-latest
     environment: production
+    timeout-minutes: 15                    # hard cap on the entire deploy job
+
 
     # Gate: only run if the build that triggered us actually passed.
     # Without this, a failed build.yml would still trigger this workflow.
