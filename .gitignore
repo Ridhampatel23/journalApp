@@ -34,3 +34,15 @@ build/
 ### VS Code ###
 .vscode/
 src/main/resources/application.properties
+
+# Local variable overrides (can contain sensitive values)
+*.tfvars
+*.tfvars.json
+
+# Local state (should never exist since we use remote state, but just in case)
+terraform.tfstate
+terraform.tfstate.backup
+
+# Terraform working directory
+.terraform/
+.terraform.lock.hcl    # optional: some teams commit this, some don't
