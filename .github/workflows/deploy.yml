@@ -1,0 +1,158 @@
+# ─────────────────────────────────────────────────────────────────────
+#  deploy.yml: Build Docker image, push to ECR, deploy to ECS.
+#
+#  Triggered by: successful completion of build.yml on the main branch.
+#  This means:
+#    - PRs never trigger a deploy (build.yml runs but deploy.yml ignores it)
+#    - Push to main triggers build.yml first; deploy.yml only starts if
+#      build.yml passes
+#    - The JAR inside the Docker image is the exact artifact that passed
+#      all tests in build.yml (artifact handoff = idempotency guarantee)
+# ─────────────────────────────────────────────────────────────────────
+
+name: Deploy
+
+on:
+  # workflow_run fires when another workflow completes.
+  # We wait for build.yml (named "SonarQube") to finish successfully
+  # on the main branch before doing anything.
+  workflow_run:
+    workflows: ["SonarQube"]    # must match the `name:` field in build.yml exactly
+    branches: [main]
+    types: [completed]
+
+  # Manual trigger for emergency deploys or rollbacks via the Actions UI.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true      # two pushes back-to-back: cancel the older deploy
+
+env:
+  AWS_REGION: ${{ env.AWS_REGION }}
+  ECR_REPOSITORY: journal-app
+  ECS_CLUSTER:    journal-app-ecs-cluster
+  ECS_SERVICE:    ${{ secrets.AWS_ECS_JOURNAL_SERVICE }}
+  ECS_TASK_DEFINITION: journal-app-task
+  CONTAINER_NAME: journal-app
+
+jobs:
+  deploy:
+    name: Push Image & Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Gate: only run if the build that triggered us actually passed.
+    # Without this, a failed build.yml would still trigger this workflow.
+    # workflow_dispatch bypasses this check (intentional for manual runs).
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Download the JAR from build.yml ────────────────────────────
+      # dawidd6/action-download-artifact handles cross-workflow artifact
+      # downloads. The native actions/download-artifact only works within
+      # the same workflow run. We key by run_id so we always get the JAR
+      # from the specific build.yml run that triggered this deploy.
+      - name: Download JAR from build workflow
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build.yml
+          run_id:   ${{ github.event.workflow_run.id }}
+          name:     app-jar
+          path:     target
+
+      # ── AWS auth ───────────────────────────────────────────────────
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      # ── ECR login ──────────────────────────────────────────────────
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ── Compute image tag ──────────────────────────────────────────
+      # Tag with the HEAD SHA of the commit that triggered the build.
+      # In workflow_run context this is event.workflow_run.head_sha,
+      # not github.sha (which would be the merge commit of deploy.yml itself).
+      - name: Set image tag
+        id: tag
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
+          echo "tag=${SHA::7}" >> "$GITHUB_OUTPUT"
+
+      # ── Build image using the downloaded JAR ───────────────────────
+      # The Dockerfile runs `COPY target/*.jar app.jar`.
+      # target/ contains the artifact from build.yml, not a fresh compile.
+      # This is the idempotency guarantee: we ship what we tested.
+      - name: Build & push Docker image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG:      ${{ steps.tag.outputs.tag }}
+        run: |
+          docker build \
+            -t "$REGISTRY/$ECR_REPOSITORY:$TAG" \
+            -t "$REGISTRY/$ECR_REPOSITORY:latest" \
+            .
+          docker push "$REGISTRY/$ECR_REPOSITORY:$TAG"
+          docker push "$REGISTRY/$ECR_REPOSITORY:latest"
+
+      # ── Fetch current task definition from AWS ─────────────────────
+      # We grab the live task def and patch only the image field.
+      # Every other field (CPU, memory, secrets, IAM roles, log config)
+      # stays exactly as configured in AWS. Nothing gets clobbered.
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition "$ECS_TASK_DEFINITION" \
+            --query taskDefinition \
+            > task-definition.json
+
+      # ── Patch the new image into the task definition ───────────────
+      - name: Render updated task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name:  ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.tag }}
+
+      # ── Register new task def revision + update ECS service ────────
+      # wait-for-service-stability: true blocks this step until all new
+      # tasks are healthy and old tasks have drained. If health checks
+      # never pass, ECS rolls back automatically and this step fails,
+      # marking the commit red in GitHub.
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service:         ${{ env.ECS_SERVICE }}
+          cluster:         ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      # ── Smoke test ─────────────────────────────────────────────────
+      # Hits the health endpoint through the ALB after the rolling deploy
+      # completes. --retry handles the brief window where new tasks are
+      # warming up but old tasks have already drained.
+      - name: Smoke test
+        run: |
+          curl --fail --retry 6 --retry-delay 10 --max-time 10 \
+            https://YOUR-ALB-URL/public/health-check    # ⚠️ your ALB DNS
+
+      # ── Summary ────────────────────────────────────────────────────
+      - name: Write deployment summary
+        if: always()
+        run: |
+          {
+            echo "### Deploy"
+            echo "- **Image:** \`${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.tag }}\`"
+            echo "- **Cluster:** \`$ECS_CLUSTER\` / **Service:** \`$ECS_SERVICE\`"
+            echo "- **Commit:** \`${{ github.event.workflow_run.head_sha || github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

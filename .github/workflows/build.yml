@@ -41,3 +41,16 @@ jobs:
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
         run: mvn -B verify -Dsonar.projectKey=Ridhampatel23_journalApp -Dsonar.organization=ridhampatel23  -Daws.sqs.weekly-sentiment-queue-url="${AWS_SQS_WEEKLY_SENTIMENT_QUEUE_URL}"
+
+      # ── NEW: Upload the tested JAR so deploy.yml can use it ──────────
+      # Only uploads on push to main (not on PRs) because we only deploy
+      # from main. The artifact is keyed to this workflow run so deploy.yml
+      # can pull the exact bytes that just passed all the tests.
+      - name: Upload JAR artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/*.jar
+          retention-days: 7
+
