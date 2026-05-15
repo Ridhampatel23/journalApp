@@ -1,0 +1,40 @@
+#In terms of application properties , the order of priorities is : CLI -> application.properties -> application.yml
+#you can also use intellijs integrated run config and pass the properties in program arguments
+#(eg : --server.port=9090) 
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+      database: ${MONGO_DB:journaldb}
+      auto-index-creation: true
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+
+server:
+  port: 8080
+  servlet:
+    context-path: /journal
+
+weather:
+  api:
+    key: ${WEATHER_API_KEY}
+
+jwt:
+  secret:
+    key: ${JWT_SECRET}
+
+feature:
+  kafka:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+
+aws:
+  region: ${AWS_REGION:us-west-2}
+  sqs:
+    weekly-sentiment-queue-url: ${SQS_WEEKLY_SENTIMENT_QUEUE_URL}
