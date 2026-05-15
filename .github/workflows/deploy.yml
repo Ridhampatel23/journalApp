@@ -29,7 +29,7 @@ concurrency:
   cancel-in-progress: true      # two pushes back-to-back: cancel the older deploy
 
 env:
-  AWS_REGION: ${{ env.AWS_REGION }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: journal-app
   ECS_CLUSTER:    journal-app-ecs-cluster
   ECS_SERVICE:    ${{ secrets.AWS_ECS_JOURNAL_SERVICE }}
@@ -144,7 +144,7 @@ jobs:
       - name: Smoke test
         run: |
           curl --fail --retry 6 --retry-delay 10 --max-time 10 \
-            https://YOUR-ALB-URL/public/health-check    # ⚠️ your ALB DNS
+            http://journal-app-alb-1893762756.us-west-2.elb.amazonaws.com/journal/public/health-check    # ⚠️ your ALB DNS
 
       # ── Summary ────────────────────────────────────────────────────
       - name: Write deployment summary
