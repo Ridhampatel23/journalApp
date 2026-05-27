@@ -13,3 +13,10 @@ variable "account_id" {
 variable "vpc_id" {
   default = "vpc-0f3c84f47f5405c19"
 }
+
+variable "subnets" {
+  default = [
+    "subnet-09ab10f3d6dc2c287",
+    "subnet-0b128b773bbde8ea3",
+  ]
+}
