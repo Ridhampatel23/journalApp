@@ -9,3 +9,7 @@ variable "app_name" {
 variable "account_id" {
   default = "372344071247"
 }
+
+variable "vpc_id" {
+  default = "vpc-0f3c84f47f5405c19"
+}

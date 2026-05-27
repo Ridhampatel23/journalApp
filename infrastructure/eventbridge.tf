@@ -6,7 +6,7 @@ resource "aws_cloudwatch_event_rule" "weekly_sentiment" {
   name                = "weekly-sentiment-digest"
   description         = "Fires every Sunday at 8am UTC to trigger the sentiment digest job"
   schedule_expression = "cron(0 8 ? * SUN *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "weekly_sentiment_sqs" {
