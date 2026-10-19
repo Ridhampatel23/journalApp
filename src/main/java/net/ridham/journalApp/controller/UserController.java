@@ -55,13 +55,8 @@ public class UserController {
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        UserEntity userInDB = userService.findUserByUsername(userName);
-        if (userInDB == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
-        UserMapper.applyUpdate(userUpdateRequest, userInDB);
-        userService.saveNewUser(userInDB);
+        userService.updateUser(userName, userUpdateRequest);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

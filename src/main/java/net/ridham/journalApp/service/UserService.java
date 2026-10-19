@@ -2,6 +2,7 @@ package net.ridham.journalApp.service;
 
 import com.mongodb.DuplicateKeyException;
 import lombok.extern.slf4j.Slf4j;
+import net.ridham.journalApp.dto.request.UserUpdateRequest;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.repository.UserRepo;
 import org.bson.types.ObjectId;
@@ -43,6 +44,34 @@ public class UserService {
             log.error("Exception", e);
             throw new RuntimeException("Error saving user", e);
         }
+    }
+
+    public UserEntity updateUser(
+            String username,
+            UserUpdateRequest request) {
+
+        UserEntity user =
+                userRepository.findByUserName(username);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        if (request.getUserName() != null
+                && !request.getUserName().trim().isEmpty()){
+
+            user.setUserName(request.getUserName());
+        }
+
+        if (request.getPassword() != null
+                && !request.getPassword().trim().isEmpty()) {
+
+            user.setPassword(
+                    passwordEncoder.encode(request.getPassword())
+            );
+        }
+
+        return userRepository.save(user);
     }
 
     public UserEntity saveAdmin(String Id) {
