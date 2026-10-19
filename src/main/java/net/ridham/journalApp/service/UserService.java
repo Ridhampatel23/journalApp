@@ -26,6 +26,10 @@ public class UserService {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public UserEntity saveNewUser(UserEntity user) {
+
+        if (userRepository.findByUserName(user.getUserName()) != null) {
+            throw new IllegalArgumentException("Username already exists");
+        }
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRoles(Arrays.asList("USER"));

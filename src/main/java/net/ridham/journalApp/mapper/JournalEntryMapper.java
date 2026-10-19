@@ -34,7 +34,7 @@ public class JournalEntryMapper {
         entry.setContent(request.getContent());
         entry.setDate(LocalDateTime.now());
         // you can change default here if you want
-        entry.setSentiment(Sentiment.HAPPY);
+        entry.setSentiment(request.getSentiment());
 
         return entry;
     }
