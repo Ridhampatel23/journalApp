@@ -22,19 +22,19 @@ A full-featured **journaling REST API** built with **Java + Spring Boot**, offer
 
 ## 🛠️ Tech Stack
 
-| Category | Technology |
-|---|---|
-| Language | Java 17+ |
-| Framework | Spring Boot 3, Spring Security |
-| Database | MongoDB |
-| Cache | Redis |
-| Messaging | AWS SQS |
-| Auth | JWT, Google OAuth 2.0 |
-| External APIs | OpenWeather |
-| Build | Maven |
-| Containerization | Docker |
-| CI/CD | GitHub Actions |
-| Docs | SpringDoc OpenAPI (Swagger UI) |
+| Category | Technology                       |
+|---|----------------------------------|
+| Language | Java 8                           |
+| Framework | Spring Boot 2.7, Spring Security |
+| Database | MongoDB                          |
+| Cache | Redis                            |
+| Messaging | AWS SQS                          |
+| Auth | JWT, Google OAuth 2.0            |
+| External APIs | OpenWeather                      |
+| Build | Maven                            |
+| Containerization | Docker                           |
+| CI/CD | GitHub Actions                   |
+| Docs | SpringDoc OpenAPI (Swagger UI)   |
 
 ---
 

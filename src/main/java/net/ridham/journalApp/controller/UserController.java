@@ -41,27 +41,6 @@ public class UserController {
     @Autowired
     private WeatherService weatherService;
 
-    @GetMapping
-    @Operation(
-            summary = "Get all users",
-            description = "Returns a list of all users in the system. Requires authorization and usually admin access depending on security rules."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Users found",
-                    content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
-            @ApiResponse(responseCode = "404", description = "No users found")
-    })
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserEntity> users = userService.getAllUsers();
-        if (users == null || users.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        List<UserResponseDTO> dtos = users.stream()
-                .map(UserMapper::toDTO)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(dtos, HttpStatus.OK);
-    }
-
     @PutMapping
     @Operation(
             summary = "Update current user",
