@@ -12,7 +12,7 @@
 
 name: Deploy
 
-#on:
+on:
 #  # workflow_run fires when another workflow completes.
 #  # We wait for build.yml (named "SonarQube") to finish successfully
 #  # on the main branch before doing anything.
@@ -22,7 +22,7 @@ name: Deploy
 #    types: [completed]
 #
 #  # Manual trigger for emergency deploys or rollbacks via the Actions UI.
-#  workflow_dispatch:
+  workflow_dispatch:
 
 concurrency:
   group: deploy-production
