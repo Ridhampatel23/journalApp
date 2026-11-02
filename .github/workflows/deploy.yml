@@ -12,17 +12,17 @@
 
 name: Deploy
 
-on:
-  # workflow_run fires when another workflow completes.
-  # We wait for build.yml (named "SonarQube") to finish successfully
-  # on the main branch before doing anything.
-  workflow_run:
-    workflows: ["SonarQube"]    # must match the `name:` field in build.yml exactly
-    branches: [main]
-    types: [completed]
-
-  # Manual trigger for emergency deploys or rollbacks via the Actions UI.
-  workflow_dispatch:
+#on:
+#  # workflow_run fires when another workflow completes.
+#  # We wait for build.yml (named "SonarQube") to finish successfully
+#  # on the main branch before doing anything.
+#  workflow_run:
+#    workflows: ["SonarQube"]    # must match the `name:` field in build.yml exactly
+#    branches: [main]
+#    types: [completed]
+#
+#  # Manual trigger for emergency deploys or rollbacks via the Actions UI.
+#  workflow_dispatch:
 
 concurrency:
   group: deploy-production
