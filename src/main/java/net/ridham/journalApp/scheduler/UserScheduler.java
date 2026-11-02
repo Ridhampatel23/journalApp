@@ -45,6 +45,7 @@ public class UserScheduler {
                if (sentiment != null) {
                    sentimentCounts.put(sentiment, sentimentCounts.getOrDefault(sentiment, 0) + 1);
                }
+           }
                Sentiment mostFrequentSentiment = null;
                int maxCount = 0;
                for (Map.Entry<Sentiment, Integer> entry : sentimentCounts.entrySet()) {
@@ -57,7 +58,7 @@ public class UserScheduler {
                    SentimentQueueMessage sentimentQueueMessage = SentimentQueueMessage.builder().email(user.getEmail()).sentiment("Sentiment for the last 7 days is " + mostFrequentSentiment).build();
                    sqsProducerService.sendWeeklySentimentMessage(sentimentQueueMessage);
                }
-           }
+
         }
 
     }
