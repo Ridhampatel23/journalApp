@@ -10,8 +10,8 @@ A full-featured **journaling REST API** built with **Java + Spring Boot**, offer
 
 - 🔐 **Authentication** — JWT-based login + **Google OAuth** sign-in
 - 📝 **Journal Entries** — full CRUD for personal journal entries
-- 💡 **Sentiment Analysis** — entries are sent to **AWS SQS** and processed asynchronously
-- 📧 **Scheduled Email Digests** — weekly sentiment summaries emailed to users via a scheduler
+- 💡 **Sentiment Analysis** — entries are sent to MongoDB and their sentiments processed asynchronously via **LangChan4j**
+- 📧 **Scheduled Email Digests** — weekly sentiment summaries emailed to users via a scheduler and **AWS SQS**
 - ☁️ **Weather Integration** — enrich entries with real-time weather data via OpenWeather API
 - ⚡ **Redis Caching** — caches app config for low-latency access
 - 👥 **Role-based Access** — admin and user roles via Spring Security
@@ -24,7 +24,7 @@ A full-featured **journaling REST API** built with **Java + Spring Boot**, offer
 
 | Category | Technology                       |
 |---|----------------------------------|
-| Language | Java 8                           |
+| Language | Java 17                           |
 | Framework | Spring Boot 2.7, Spring Security |
 | Database | MongoDB                          |
 | Cache | Redis                            |
