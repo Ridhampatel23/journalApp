@@ -25,7 +25,7 @@ public class UserEntity {
         @NonNull
         private String userName;
         private String email;
-        private String sentimentAnalysis;
+        private Boolean sentimentAnalysis;
         @NonNull
         private String password;
         //Declaring it as Arraylist will help you make it an exmpty list instead of null
