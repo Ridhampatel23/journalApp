@@ -38,28 +38,6 @@ A full-featured **journaling REST API** built with **Java + Spring Boot**, offer
 
 ---
 
-## 🏗️ Architecture Overview
-
-```
-      ┌──────────────┐
-      │   Client     │
-      └──────┬───────┘
-             │ REST + JWT
-             ▼
-  ┌────────────────────────┐
-  │    Journal App API     │◄───── Redis (config cache)
-  │   (Spring Boot)        │
-  └────┬───────┬───────┬───┘
-       │       │       │
-       ▼       ▼       ▼
-   MongoDB  AWS SQS  OpenWeather API
-              │
-              ▼
-      Sentiment Consumer ──► Email Service (scheduled digests)
-```
-
----
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -72,6 +50,7 @@ A full-featured **journaling REST API** built with **Java + Spring Boot**, offer
 - Gmail credentials (for email notifications)
 - Google OAuth client credentials
 - OpenWeather API key
+- LLM provider for LangChain4j
 
 ### Setup
 
@@ -94,6 +73,7 @@ A full-featured **journaling REST API** built with **Java + Spring Boot**, offer
    - Google OAuth client ID & secret
    - OpenWeather API key
    - SMTP / Gmail credentials
+   - LLM provider credentials
 
 3. **Build:**
    ```bash
