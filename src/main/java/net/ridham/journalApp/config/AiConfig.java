@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.time.Duration;
 import java.util.Map;
@@ -59,6 +60,7 @@ public class AiConfig {
                 .build();
     }
 
+    @Primary
     @Bean
     @ConditionalOnProperty(name = "ai.provider", havingValue = "ollama",  matchIfMissing = true)
     public ChatModel ollamaChatModel(@Value("${ai.ollama.base-url:http://localhost:11434}") String baseUrl,
