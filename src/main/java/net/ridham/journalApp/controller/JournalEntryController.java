@@ -14,6 +14,7 @@ import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.mapper.JournalEntryMapper;
 import net.ridham.journalApp.service.JournalEntryService;
+import net.ridham.journalApp.service.SentimentService;
 import net.ridham.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ import java.util.stream.Collectors;
 @Tag(name = "Journal", description = "Endpoints for journal entries linked to the authenticated user")
 @SecurityRequirement(name = "BearerAuth")
 public class JournalEntryController {
+
+    @Autowired
+    private SentimentService sentimentService;
 
     @Autowired
     private JournalEntryService journalEntryService;
@@ -88,6 +92,7 @@ public class JournalEntryController {
 
             JournalEntry entry = JournalEntryMapper.fromRequest(myEntryRequest);
             journalEntryService.saveEntry(entry, userName);
+            sentimentService.classifyAsync(entry.getId(), entry.getTitle(), entry.getContent());
 
             return new ResponseEntity<>(JournalEntryMapper.toDTO(entry), HttpStatus.CREATED);
         } catch (Exception e) {
@@ -196,7 +201,14 @@ public class JournalEntryController {
             if (journalEntry.isPresent()) {
                 JournalEntry old = journalEntry.get();
                 JournalEntryMapper.applyUpdate(newEntryRequest, old);
+                boolean contentChanged = newEntryRequest.getContent() != null && !newEntryRequest.getContent().isEmpty();
+                if (contentChanged) {
+                    old.setSentiment(null);                  // mark as pending again
+                }
                 journalEntryService.saveEntry(old);
+                if (contentChanged) {
+                    sentimentService.classifyAsync(old.getId(), old.getTitle(), old.getContent());
+                }
                 return new ResponseEntity<>(JournalEntryMapper.toDTO(old), HttpStatus.OK);
             }
         }

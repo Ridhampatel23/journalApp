@@ -9,7 +9,4 @@ import javax.validation.constraints.NotNull;
 public class JournalEntryRequest {
     private String title;
     private String content;
-
-    @NotNull(message = "Sentiment is required")
-    private Sentiment sentiment;
 }

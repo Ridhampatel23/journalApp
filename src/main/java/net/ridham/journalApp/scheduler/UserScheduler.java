@@ -6,6 +6,7 @@ import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.enums.Sentiment;
 import net.ridham.journalApp.model.SentimentQueueMessage;
 import net.ridham.journalApp.repository.UserRepoImpl;
+import net.ridham.journalApp.service.SentimentService;
 import net.ridham.journalApp.service.SqsProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,6 +22,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserScheduler {
+
+    @Autowired
+    private SentimentService sentimentService;
 
     @Autowired
     private AppCache appCache;
@@ -39,6 +43,12 @@ public class UserScheduler {
         List<UserEntity> users = userRepo.getUsersForSentimentAnalysis();
         for (UserEntity user : users) {
             List<JournalEntry> journalEntries = user.getJournalEntries();
+            // anything the async pass missed (outage, dropped task) gets classified now, once
+            for (JournalEntry entry : journalEntries) {
+                if (entry.getSentiment() == null && entry.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))) {
+                    entry.setSentiment(sentimentService.classifyAndStore(entry.getId(), entry.getTitle(), entry.getContent()));
+                }
+            }
             List<Sentiment> sentiments = journalEntries.stream().filter(x -> x.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))).map(x -> x.getSentiment()).collect(Collectors.toList());
            Map<Sentiment, Integer> sentimentCounts = new HashMap<>();
            for (Sentiment sentiment : sentiments) {
