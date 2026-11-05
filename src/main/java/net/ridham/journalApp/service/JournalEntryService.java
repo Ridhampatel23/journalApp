@@ -44,11 +44,16 @@ public class JournalEntryService {
         }
     }
 
-    public void saveEntry (JournalEntry journalEntry) {
-        try{
+    public void saveEntry(JournalEntry journalEntry) {
+        try {
             journalEntryRepo.save(journalEntry);
-        } catch (Exception e) {
-            log.error("Exception" , e );
+        } catch (RuntimeException e) {
+            log.error(
+                    "Failed to save journal entry with ID: {}",
+                    journalEntry.getId(),
+                    e
+            );
+            throw e;
         }
     }
 
