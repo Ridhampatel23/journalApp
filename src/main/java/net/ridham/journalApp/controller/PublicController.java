@@ -1,15 +1,11 @@
 package net.ridham.journalApp.controller;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 import net.ridham.journalApp.dto.request.LoginRequest;
 import net.ridham.journalApp.dto.request.UserRegistrationRequest;
 import net.ridham.journalApp.dto.response.UserResponseDTO;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.mapper.UserMapper;
-import net.ridham.journalApp.model.SentimentQueueMessage;
-import net.ridham.journalApp.scheduler.UserScheduler;
-import net.ridham.journalApp.service.SqsProducerService;
 import net.ridham.journalApp.service.UserDetailsServiceImpl;
 import net.ridham.journalApp.service.UserService;
 import net.ridham.journalApp.utils.JWTUtil;
@@ -108,10 +104,4 @@ public class PublicController {
             return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
         }
     }
-
-    @Autowired
-    private UserScheduler userScheduler;
-
-    @Autowired
-    private SqsProducerService sqsProducerService;
 }
