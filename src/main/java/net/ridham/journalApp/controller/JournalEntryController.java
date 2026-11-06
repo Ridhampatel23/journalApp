@@ -103,7 +103,11 @@ public class JournalEntryController {
 
         JournalEntry saved = journalEntryService.saveEntry(entry, authentication.getName());
 
-        sentimentService.classifyAsync(entry.getId(), entry.getTitle(), entry.getContent());
+        sentimentService.classifyAsync(
+                saved.getId(),
+                saved.getTitle(),
+                saved.getContent()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

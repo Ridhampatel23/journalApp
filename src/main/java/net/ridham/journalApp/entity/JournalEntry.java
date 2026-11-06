@@ -27,7 +27,6 @@ public class JournalEntry {
     @NonNull
     private String title;
 
-    @Indexed
     private ObjectId userId;
 
     private String content;

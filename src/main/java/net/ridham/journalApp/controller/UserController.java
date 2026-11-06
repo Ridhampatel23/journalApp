@@ -69,10 +69,12 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "User deleted successfully")
     })
-    public ResponseEntity<Void> deleteUserById() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        userRepo.deleteByUserName(authentication.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteUserById(
+            Authentication authentication) {
+
+        userService.deleteAccount(authentication.getName());
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/greeting")

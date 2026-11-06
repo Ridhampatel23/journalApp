@@ -4,12 +4,14 @@ import com.mongodb.DuplicateKeyException;
 import lombok.extern.slf4j.Slf4j;
 import net.ridham.journalApp.dto.request.UserUpdateRequest;
 import net.ridham.journalApp.entity.UserEntity;
+import net.ridham.journalApp.repository.JournalEntryRepo;
 import net.ridham.journalApp.repository.UserRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +25,9 @@ public class UserService {
 
     @Autowired
     private UserRepo userRepository;
+
+    @Autowired
+    private JournalEntryRepo journalEntryRepo;
 
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -107,10 +112,21 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public void deleteUserById(ObjectId id) {
-        userRepository.deleteById(id);
-    }
+    @Transactional
+    public void deleteAccount(String username) {
+        UserEntity user = userRepository.findByUserName(username);
 
+        if (user == null) {
+            throw new IllegalStateException("Authenticated user not found");
+        }
+
+        ObjectId userId = user.getId();
+
+        journalEntryRepo.deleteByUserId(userId);
+        userRepository.delete(user);
+
+        log.info("Deleted user account and associated journals");
+    }
     public UserEntity findUserByUsername(String userName) {
         return userRepository.findByUserName(userName);
     }

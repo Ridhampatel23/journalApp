@@ -4,9 +4,11 @@ import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.enums.Sentiment;
 import net.ridham.journalApp.model.SentimentQueueMessage;
+import net.ridham.journalApp.repository.JournalEntryRepo;
 import net.ridham.journalApp.repository.UserRepoImpl;
 import net.ridham.journalApp.service.SentimentService;
 import net.ridham.journalApp.service.SqsProducerService;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -18,9 +20,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +36,9 @@ class UserSchedulerTest {
 
     @Mock
     private UserRepoImpl userRepo;
+
+    @Mock
+    private JournalEntryRepo journalEntryRepo;
 
     @Mock
     private SentimentService sentimentService;
@@ -97,15 +104,32 @@ class UserSchedulerTest {
         verifyNoInteractions(sentimentService);
     }
 
-    private static UserEntity user(String email, JournalEntry... entries) {
-        return UserEntity.builder()
+    private UserEntity user(String email, JournalEntry... entries) {
+
+        ObjectId userId = new ObjectId();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
                 .userName("ridham")
                 .password("hash")
                 .email(email)
-                .journalEntries(new ArrayList<>(Arrays.asList(entries)))
                 .build();
-    }
 
+        List<JournalEntry> recentEntries = Arrays.stream(entries)
+                .filter(entry ->
+                        entry.getDate().isAfter(
+                                LocalDateTime.now().minusDays(7)
+                        )
+                )
+                .toList();
+
+        when(journalEntryRepo.findByUserIdAndDateAfter(
+                eq(userId),
+                any(LocalDateTime.class)
+        )).thenReturn(recentEntries);
+
+        return user;
+    }
     private static JournalEntry entry(Sentiment sentiment, int daysAgo) {
         JournalEntry entry = new JournalEntry();
         entry.setTitle("title");
