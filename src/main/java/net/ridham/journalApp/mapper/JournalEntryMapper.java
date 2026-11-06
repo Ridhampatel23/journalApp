@@ -1,9 +1,9 @@
 package net.ridham.journalApp.mapper;
 
 import net.ridham.journalApp.dto.request.JournalEntryRequest;
+import net.ridham.journalApp.dto.request.JournalEntryUpdateRequest;
 import net.ridham.journalApp.dto.response.JournalEntryResponseDTO;
 import net.ridham.journalApp.entity.JournalEntry;
-import net.ridham.journalApp.enums.Sentiment;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ public class JournalEntryMapper {
         return entry;
     }
 
-    public static void applyUpdate(JournalEntryRequest request, JournalEntry existing) {
+    public static void applyUpdate(JournalEntryUpdateRequest request, JournalEntry existing) {
         if (request == null || existing == null) return;
 
         if (request.getTitle() != null && !request.getTitle().isEmpty()) {

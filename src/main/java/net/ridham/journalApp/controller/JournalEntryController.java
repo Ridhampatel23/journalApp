@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.Parameter;
 import net.ridham.journalApp.dto.request.JournalEntryRequest;
+import net.ridham.journalApp.dto.request.JournalEntryUpdateRequest;
 import net.ridham.journalApp.dto.response.JournalEntryResponseDTO;
 import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
@@ -176,7 +177,7 @@ public class JournalEntryController {
     })
     public ResponseEntity<JournalEntryResponseDTO> updateJournalEntryById(
             @Parameter(description = "ID of the journal entry to update") @PathVariable String myID,
-            @RequestBody JournalEntryRequest newEntryRequest
+            @RequestBody JournalEntryUpdateRequest newEntryRequest
     ) {
 
         if (!ObjectId.isValid(myID)) {
