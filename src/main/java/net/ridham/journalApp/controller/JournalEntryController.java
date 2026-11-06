@@ -84,20 +84,18 @@ public class JournalEntryController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<JournalEntryResponseDTO> createJournalEntry(
-           @Valid @RequestBody JournalEntryRequest myEntryRequest
-    ) {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String userName = auth.getName();
+            @Valid @RequestBody JournalEntryRequest request,
+            Authentication authentication) {
 
-            JournalEntry entry = JournalEntryMapper.fromRequest(myEntryRequest);
-            journalEntryService.saveEntry(entry, userName);
-            sentimentService.classifyAsync(entry.getId(), entry.getTitle(), entry.getContent());
+        JournalEntry entry = JournalEntryMapper.fromRequest(request);
 
-            return new ResponseEntity<>(JournalEntryMapper.toDTO(entry), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        journalEntryService.saveEntry(entry, authentication.getName());
+
+        sentimentService.classifyAsync(entry.getId(), entry.getTitle(), entry.getContent());
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(JournalEntryMapper.toDTO(entry));
     }
 
 
@@ -194,7 +192,7 @@ public class JournalEntryController {
 
         List<JournalEntry> foundEntry = user.getJournalEntries().stream()
                 .filter(journalEntry -> journalEntry.getId().equals(objectId))
-                .collect(Collectors.toList());
+                .toList();
 
         if (!foundEntry.isEmpty()) {
             Optional<JournalEntry> journalEntry = journalEntryService.findJournalEntryById(objectId);
