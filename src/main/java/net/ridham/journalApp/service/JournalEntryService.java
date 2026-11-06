@@ -36,7 +36,6 @@ public class JournalEntryService {
             JournalEntry entry,
             String username) {
 
-        entry.setId(null);
         entry.setUserId(getUserId(username));
         entry.setDate(LocalDateTime.now());
 
