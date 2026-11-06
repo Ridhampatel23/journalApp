@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,48 +42,61 @@ public class UserScheduler {
     //have a @scheduled annotation. You can achieve it by annotating the main class
     // with @EnableScheduling
     //@Scheduled(cron = "0 0 8 * * SUN")
-    public void fetchUsersAndSendSentimentMail(){
+    public void fetchUsersAndSendSentimentMail() {
+
+        LocalDateTime since = LocalDateTime.now().minusDays(7);
+
         List<UserEntity> users = userRepo.getUsersForSentimentAnalysis();
+
         for (UserEntity user : users) {
 
-            //We need the journal entries from the past 7 days to put out the weekly sentiment digest
-            LocalDateTime since = LocalDateTime.now().minusDays(7);
-
-            List<JournalEntry> journalEntries =
+            List<JournalEntry> entries =
                     journalEntryRepo.findByUserIdAndDateAfter(
                             user.getId(),
                             since
                     );
-            // anything the async pass missed (outage, dropped task) gets classified now, once
-            for (JournalEntry entry : journalEntries) {
-                if (entry.getSentiment() == null && entry.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))) {
-                    entry.setSentiment(sentimentService.classifyAndStore(entry.getId(), entry.getTitle(), entry.getContent()));
+
+            Map<Sentiment, Integer> counts =
+                    new EnumMap<>(Sentiment.class);
+
+            for (JournalEntry entry : entries) {
+
+                Sentiment sentiment = entry.getSentiment();
+
+                if (sentiment == null) {
+                    sentiment = sentimentService.classifyAndStore(
+                            entry.getId(),
+                            entry.getTitle(),
+                            entry.getContent()
+                    );
+                }
+
+                if (sentiment != null) {
+                    counts.merge(sentiment, 1, Integer::sum);
                 }
             }
-            List<Sentiment> sentiments = journalEntries.stream().filter(x -> x.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))).map(x -> x.getSentiment()).collect(Collectors.toList());
-           Map<Sentiment, Integer> sentimentCounts = new HashMap<>();
-           for (Sentiment sentiment : sentiments) {
-               if (sentiment != null) {
-                   sentimentCounts.put(sentiment, sentimentCounts.getOrDefault(sentiment, 0) + 1);
-               }
-           }
-               Sentiment mostFrequentSentiment = null;
-               int maxCount = 0;
-               for (Map.Entry<Sentiment, Integer> entry : sentimentCounts.entrySet()) {
-                   if (entry.getValue() > maxCount) {
-                       mostFrequentSentiment = entry.getKey();
-                       maxCount = entry.getValue();
-                   }
-               }
-               if (mostFrequentSentiment != null) {
-                   SentimentQueueMessage sentimentQueueMessage = SentimentQueueMessage.builder().email(user.getEmail()).sentiment("Sentiment for the last 7 days is " + mostFrequentSentiment).build();
-                   sqsProducerService.sendWeeklySentimentMessage(sentimentQueueMessage);
-               }
 
+            Sentiment mostFrequent = counts.entrySet()
+                    .stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+
+            if (mostFrequent != null) {
+
+                SentimentQueueMessage message =
+                        SentimentQueueMessage.builder()
+                                .email(user.getEmail())
+                                .sentiment(
+                                        "Sentiment for the last 7 days is "
+                                                + mostFrequent
+                                )
+                                .build();
+
+                sqsProducerService.sendWeeklySentimentMessage(message);
+            }
         }
-
     }
-
     //@Scheduled(cron = "0 */5 * * * *")
     public void clearAppCache(){
         appCache.init();
