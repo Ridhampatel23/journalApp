@@ -7,6 +7,7 @@ import net.ridham.journalApp.entity.JournalEntry;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class JournalEntryMapper {
 
@@ -26,10 +27,10 @@ public class JournalEntryMapper {
     }
 
     public static JournalEntry fromRequest(JournalEntryRequest request) {
-        if (request == null) return null;
+
+        Objects.requireNonNull(request, "Journal request cannot be null");
 
         JournalEntry entry = new JournalEntry();
-        // id left null so Mongo generates it
         entry.setTitle(request.getTitle());
         entry.setContent(request.getContent());
         entry.setDate(LocalDateTime.now());
