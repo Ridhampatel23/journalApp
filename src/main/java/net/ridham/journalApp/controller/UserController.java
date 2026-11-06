@@ -1,17 +1,14 @@
 package net.ridham.journalApp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.ridham.journalApp.api.response.WeatherResponse;
 import net.ridham.journalApp.dto.request.UserUpdateRequest;
-import net.ridham.journalApp.dto.response.UserResponseDTO;
-import net.ridham.journalApp.entity.UserEntity;
-import net.ridham.journalApp.mapper.UserMapper;
 import net.ridham.journalApp.repository.UserRepo;
 import net.ridham.journalApp.service.UserService;
 import net.ridham.journalApp.service.WeatherService;
@@ -21,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 // A controller class makes end points and calls service class,
 // Service class contains business logic

@@ -1,6 +1,7 @@
 package net.ridham.journalApp.dto.response;
 
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data

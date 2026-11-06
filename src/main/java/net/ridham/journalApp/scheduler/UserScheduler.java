@@ -10,8 +10,6 @@ import net.ridham.journalApp.repository.UserRepoImpl;
 import net.ridham.journalApp.service.SentimentService;
 import net.ridham.journalApp.service.SqsProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

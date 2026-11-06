@@ -1,38 +1,33 @@
 package net.ridham.journalApp.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.ridham.journalApp.dto.request.JournalEntryRequest;
 import net.ridham.journalApp.dto.request.JournalEntryUpdateRequest;
 import net.ridham.journalApp.dto.response.JournalEntryResponseDTO;
 import net.ridham.journalApp.entity.JournalEntry;
-import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.mapper.JournalEntryMapper;
 import net.ridham.journalApp.service.JournalEntryService;
 import net.ridham.journalApp.service.SentimentService;
 import net.ridham.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import java.util.Objects;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 // A controller class makes end points and calls service class,
 // Service class contains business logic
