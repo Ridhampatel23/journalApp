@@ -28,8 +28,6 @@ public class UserEntity {
         private Boolean sentimentAnalysis;
         @NonNull
         private String password;
-        //Declaring it as Arraylist will help you make it an exmpty list instead of null
-        @DBRef
-        private List<JournalEntry> journalEntries = new ArrayList<>();
+
         private List<String> roles;
 }

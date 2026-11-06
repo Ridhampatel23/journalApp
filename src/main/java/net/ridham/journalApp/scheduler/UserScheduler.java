@@ -5,6 +5,7 @@ import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.enums.Sentiment;
 import net.ridham.journalApp.model.SentimentQueueMessage;
+import net.ridham.journalApp.repository.JournalEntryRepo;
 import net.ridham.journalApp.repository.UserRepoImpl;
 import net.ridham.journalApp.service.SentimentService;
 import net.ridham.journalApp.service.SqsProducerService;
@@ -30,6 +31,9 @@ public class UserScheduler {
     private AppCache appCache;
 
     @Autowired
+    private JournalEntryRepo journalEntryRepo;
+
+    @Autowired
     private UserRepoImpl userRepo;
 
     @Autowired
@@ -42,7 +46,15 @@ public class UserScheduler {
     public void fetchUsersAndSendSentimentMail(){
         List<UserEntity> users = userRepo.getUsersForSentimentAnalysis();
         for (UserEntity user : users) {
-            List<JournalEntry> journalEntries = user.getJournalEntries();
+
+            //We need the journal entries from the past 7 days to put out the weekly sentiment digest
+            LocalDateTime since = LocalDateTime.now().minusDays(7);
+
+            List<JournalEntry> journalEntries =
+                    journalEntryRepo.findByUserIdAndDateAfter(
+                            user.getId(),
+                            since
+                    );
             // anything the async pass missed (outage, dropped task) gets classified now, once
             for (JournalEntry entry : journalEntries) {
                 if (entry.getSentiment() == null && entry.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))) {

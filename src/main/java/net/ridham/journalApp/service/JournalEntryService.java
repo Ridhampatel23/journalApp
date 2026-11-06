@@ -1,98 +1,83 @@
 package net.ridham.journalApp.service;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import net.ridham.journalApp.entity.JournalEntry;
 import net.ridham.journalApp.entity.UserEntity;
 import net.ridham.journalApp.repository.JournalEntryRepo;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
-/// A service class contains business logic which is then
-/// called and used by controller class to make API endpoints
 @Service
-@Slf4j
+@RequiredArgsConstructor
 public class JournalEntryService {
 
+    private final JournalEntryRepo journalEntryRepo;
+    private final UserService userService;
 
-    @Autowired
-    private JournalEntryRepo journalEntryRepo;
+    private ObjectId getUserId(String username) {
+        UserEntity user = userService.findUserByUsername(username);
 
-    @Autowired
-    private UserService userService;
-
-    @Transactional //Don't forget to enable transactional management in main file
-    public void saveEntry (JournalEntry journalEntry, String userName) {
-        try{
-            UserEntity user = userService.findUserByUsername(userName);
-
-            if (user == null) {
-                throw new IllegalStateException("Authenticated user not found");
-            }
-
-            journalEntry.setDate(LocalDateTime.now());
-
-            // Saving it at two different places and marking it a dbref will connect it
-            JournalEntry saved = journalEntryRepo.save(journalEntry);
-
-            // Keep in mind to save it as a transaction, If the internet goes down midway
-            // or something else happens, it might only save it in journal entries and not
-            // in user!
-            user.getJournalEntries().add(saved);
-            userService.saveEntryInUser(user);
-        } catch (Exception e) {
-
-            log.error("Exception is: " , e );
-            throw new RuntimeException("An error occured while saving journal entry", e);
-        }
-    }
-
-    public void saveEntry(JournalEntry journalEntry) {
-        try {
-            journalEntryRepo.save(journalEntry);
-        } catch (RuntimeException e) {
-            log.error(
-                    "Failed to save journal entry with ID: {}",
-                    journalEntry.getId(),
-                    e
+        if (user == null) {
+            throw new IllegalStateException(
+                    "Authenticated user not found"
             );
-            throw e;
         }
+
+        return user.getId();
     }
 
+    // CREATE
+    public JournalEntry saveEntry(
+            JournalEntry entry,
+            String username) {
 
+        entry.setId(null);
+        entry.setUserId(getUserId(username));
+        entry.setDate(LocalDateTime.now());
 
-    public List<JournalEntry> getAllJournalEntries() {
-        return journalEntryRepo.findAll();
+        return journalEntryRepo.save(entry);
     }
 
-    public Optional<JournalEntry> findJournalEntryById(ObjectId id) {
-        return journalEntryRepo.findById(id);
+    // UPDATE (after ownership verification)
+    public JournalEntry saveEntry(JournalEntry entry) {
+        return journalEntryRepo.save(entry);
     }
 
-    @Transactional
-    public boolean deleteJournalEntryById(ObjectId id, String userName) {
-        boolean removed = false;
-        try {
-        UserEntity user = userService.findUserByUsername(userName);
-        removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
-        if (removed) {
-            userService.saveEntryInUser(user); // If we use saveEntry on the same ID it updates the previous entry (mongoDB specific)
-            journalEntryRepo.deleteById(id);
-        }
-    } catch (Exception e) {
-            log.error("Exception" , e );
-            throw new RuntimeException("An error occurred while deleting journal entry", e);
-        }
-        return removed;
+    // READ ALL (paginated)
+    public Page<JournalEntry> getEntries(
+            String username,
+            Pageable pageable) {
 
+        return journalEntryRepo.findByUserId(
+                getUserId(username),
+                pageable
+        );
     }
 
+    // READ ONE (owner scoped)
+    public Optional<JournalEntry> findJournalEntryById(
+            ObjectId id,
+            String username) {
 
+        return journalEntryRepo.findByUserIdAndId(
+                getUserId(username),
+                id
+        );
+    }
 
+    // DELETE ONE (owner scoped)
+    public boolean deleteJournalEntryById(
+            ObjectId id,
+            String username) {
+
+        return journalEntryRepo.deleteByUserIdAndId(
+                getUserId(username),
+                id
+        ) > 0;
+    }
 }

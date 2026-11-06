@@ -24,6 +24,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import java.util.Objects;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -48,7 +52,7 @@ public class JournalEntryController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
+
     @Operation(
             summary = "Get all journal entries for current user",
             description = "Returns all journal entries belonging to the currently authenticated user."
@@ -58,20 +62,27 @@ public class JournalEntryController {
                     content = @Content(schema = @Schema(implementation = JournalEntryResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "No entries found")
     })
-    public ResponseEntity<List<JournalEntryResponseDTO>> getAllJournalEntriesOfUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userName = auth.getName();
-        UserEntity user = userService.findUserByUsername(userName);
+    @GetMapping
+    public ResponseEntity<Page<JournalEntryResponseDTO>> getAllJournalEntriesOfUser(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
 
-        if (user == null || user.getJournalEntries() == null || user.getJournalEntries().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (page < 0 || size < 1 || size > 100) {
+            return ResponseEntity.badRequest().build();
         }
 
-        List<JournalEntryResponseDTO> dtos = user.getJournalEntries().stream()
-                .map(JournalEntryMapper::toDTO)
-                .collect(Collectors.toList());
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "date")
+        );
 
-        return new ResponseEntity<>(dtos, HttpStatus.OK);
+        Page<JournalEntryResponseDTO> entries = journalEntryService
+                .getEntries(authentication.getName(), pageable)
+                .map(JournalEntryMapper::toDTO);
+
+        return ResponseEntity.ok(entries);
     }
 
     @PostMapping
@@ -90,13 +101,13 @@ public class JournalEntryController {
 
         JournalEntry entry = JournalEntryMapper.fromRequest(request);
 
-        journalEntryService.saveEntry(entry, authentication.getName());
+        JournalEntry saved = journalEntryService.saveEntry(entry, authentication.getName());
 
         sentimentService.classifyAsync(entry.getId(), entry.getTitle(), entry.getContent());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(JournalEntryMapper.toDTO(entry));
+                .body(JournalEntryMapper.toDTO(saved));
     }
 
 
@@ -108,34 +119,17 @@ public class JournalEntryController {
             @ApiResponse(responseCode = "404", description = "Entry not found")
     })
     public ResponseEntity<JournalEntryResponseDTO> getJournalEntryById(
-            @PathVariable @Parameter(
-                    description = "24-character MongoDB ObjectId",
-                    example = "507f1f77bcf86cd799439011"
-            ) String myID,
-            Authentication authentication
-    ) {
+            @PathVariable String myID,
+            Authentication authentication) {
+
         if (!ObjectId.isValid(myID)) {
             return ResponseEntity.badRequest().build();
         }
 
-        ObjectId objectId = new ObjectId(myID);
-
-        UserEntity user = userService.findUserByUsername(
-                authentication.getName()
-        );
-
-        if (user == null || user.getJournalEntries() == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        boolean ownsEntry = user.getJournalEntries().stream()
-                .anyMatch(entry -> objectId.equals(entry.getId()));
-
-        if (!ownsEntry) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return journalEntryService.findJournalEntryById(objectId)
+        return journalEntryService.findJournalEntryById(
+                        new ObjectId(myID),
+                        authentication.getName()
+                )
                 .map(entry -> ResponseEntity.ok(
                         JournalEntryMapper.toDTO(entry)
                 ))
@@ -145,20 +139,17 @@ public class JournalEntryController {
 
     @DeleteMapping("/id/{myID}")
     public ResponseEntity<Void> deleteJournalEntry(
-            @PathVariable("myID") String myID,
-            Authentication authentication
-    ) {
+            @PathVariable String myID,
+            Authentication authentication) {
+
         if (!ObjectId.isValid(myID)) {
             return ResponseEntity.badRequest().build();
         }
 
-        ObjectId objectId = new ObjectId(myID);
-
-        boolean deleted = journalEntryService
-                .deleteJournalEntryById(
-                        objectId,
-                        authentication.getName()
-                );
+        boolean deleted = journalEntryService.deleteJournalEntryById(
+                new ObjectId(myID),
+                authentication.getName()
+        );
 
         return deleted
                 ? ResponseEntity.noContent().build()
@@ -176,41 +167,51 @@ public class JournalEntryController {
             @ApiResponse(responseCode = "404", description = "Entry not found")
     })
     public ResponseEntity<JournalEntryResponseDTO> updateJournalEntryById(
-            @Parameter(description = "ID of the journal entry to update") @PathVariable String myID,
-            @RequestBody JournalEntryUpdateRequest newEntryRequest
-    ) {
+            @PathVariable String myID,
+            @Valid @RequestBody JournalEntryUpdateRequest request,
+            Authentication authentication) {
 
         if (!ObjectId.isValid(myID)) {
             return ResponseEntity.badRequest().build();
         }
 
-        ObjectId objectId = new ObjectId(myID);
+        Optional<JournalEntry> found = journalEntryService
+                .findJournalEntryById(
+                        new ObjectId(myID),
+                        authentication.getName()
+                );
 
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userName = auth.getName();
-        UserEntity user = userService.findUserByUsername(userName);
-
-        List<JournalEntry> foundEntry = user.getJournalEntries().stream()
-                .filter(journalEntry -> journalEntry.getId().equals(objectId))
-                .toList();
-
-        if (!foundEntry.isEmpty()) {
-            Optional<JournalEntry> journalEntry = journalEntryService.findJournalEntryById(objectId);
-            if (journalEntry.isPresent()) {
-                JournalEntry old = journalEntry.get();
-                JournalEntryMapper.applyUpdate(newEntryRequest, old);
-                boolean contentChanged = newEntryRequest.getContent() != null && !newEntryRequest.getContent().isEmpty();
-                if (contentChanged) {
-                    old.setSentiment(null);                  // mark as pending again
-                }
-                journalEntryService.saveEntry(old);
-                if (contentChanged) {
-                    sentimentService.classifyAsync(old.getId(), old.getTitle(), old.getContent());
-                }
-                return new ResponseEntity<>(JournalEntryMapper.toDTO(old), HttpStatus.OK);
-            }
+        if (found.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        JournalEntry entry = found.get();
+
+        String oldTitle = entry.getTitle();
+        String oldContent = entry.getContent();
+
+        JournalEntryMapper.applyUpdate(request, entry);
+
+        boolean changed =
+                !Objects.equals(oldTitle, entry.getTitle()) ||
+                        !Objects.equals(oldContent, entry.getContent());
+
+        if (changed) {
+            entry.setSentiment(null);
+        }
+
+        JournalEntry saved = changed
+                ? journalEntryService.saveEntry(entry)
+                : entry;
+
+        if (changed) {
+            sentimentService.classifyAsync(
+                    saved.getId(),
+                    saved.getTitle(),
+                    saved.getContent()
+            );
+        }
+
+        return ResponseEntity.ok(JournalEntryMapper.toDTO(saved));
     }
 }
