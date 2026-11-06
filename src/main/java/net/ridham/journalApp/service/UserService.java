@@ -39,6 +39,7 @@ public class UserService {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRoles(Arrays.asList("USER"));
+            user.setSentimentAnalysis(true);
             return userRepository.save(user);
         } catch (DuplicateKeyException e) {
             log.error("Duplicate key exception", e);
@@ -100,9 +101,6 @@ public class UserService {
         }
     }
 
-    public void saveEntryInUser(UserEntity user) {
-        userRepository.save(user);
-    }
 
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
