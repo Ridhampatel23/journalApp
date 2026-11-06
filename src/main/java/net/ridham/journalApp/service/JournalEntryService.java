@@ -30,15 +30,23 @@ public class JournalEntryService {
     public void saveEntry (JournalEntry journalEntry, String userName) {
         try{
             UserEntity user = userService.findUserByUsername(userName);
+
+            if (user == null) {
+                throw new IllegalStateException("Authenticated user not found");
+            }
+
             journalEntry.setDate(LocalDateTime.now());
-            // Saving it at two different place and marking it a dbref will connect it
+
+            // Saving it at two different places and marking it a dbref will connect it
             JournalEntry saved = journalEntryRepo.save(journalEntry);
-            // Keep in mind to save it as a transaction as , If the internet goes down midway
+
+            // Keep in mind to save it as a transaction, If the internet goes down midway
             // or something else happens, it might only save it in journal entries and not
             // in user!
             user.getJournalEntries().add(saved);
             userService.saveEntryInUser(user);
         } catch (Exception e) {
+
             log.error("Exception is: " , e );
             throw new RuntimeException("An error occured while saving journal entry", e);
         }
